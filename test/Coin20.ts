@@ -14,6 +14,61 @@ describe("Coin20", function () {
     return { owner, other, coin20 };
   }
 
+  describe("Custom structure", function () {
+    it("Create profile", async function () {
+      const { owner, coin20 } = await getFixture();
+      expect(await coin20.createProfile("a", 1, true))
+      .to.emit(coin20, "CreateProfile")
+      .withArgs(owner.address, "a", 1, true);
+    });
+
+    it("Get profile info", async function () {
+      const { owner, coin20 } = await getFixture();
+      await coin20.createProfile("a", 1, true);
+
+      expect(await coin20.getName(owner.address)).equal("a");
+      expect(await coin20.getFavoriteNumber(owner.address)).equal(1);
+      expect(await coin20.getIsDating(owner.address)).equal(true);
+    });
+
+    it("Remove profile", async function () {
+      const { owner, coin20 } = await getFixture();
+      expect(await coin20.createProfile("a", 1, false))
+      .to.emit(coin20, "CreateProfile")
+      .withArgs(owner.address, "a", 1, false);
+      expect(await coin20.getName(owner.address)).equal("a");
+
+      expect(await coin20.removeProfile())
+      .to.emit(coin20, "RemoveProfile")
+      .withArgs(owner.address);
+
+      expect(await coin20.getName(owner.address)).equal("");
+    });
+
+    it("Replace profile", async function () {
+      const { owner, coin20 } = await getFixture();
+      expect(await coin20.createProfile("a", 1, true))
+      .to.emit(coin20, "CreateProfile")
+      .withArgs(owner.address, "a", 1, true);
+
+      expect(await coin20.createProfile("b", 2, false))
+      .to.emit(coin20, "CreateProfile")
+      .withArgs(owner.address, "b", 2, false);
+      expect(await coin20.getName(owner.address)).equal("b");
+      expect(await coin20.getFavoriteNumber(owner.address)).equal(2);
+      expect(await coin20.getIsDating(owner.address)).equal(false);
+    });
+
+    it("Remove empty profile", async function () {
+      const { owner, coin20 } = await getFixture();
+      expect(await coin20.removeProfile())
+      .to.emit(coin20, "RemoveProfile")
+      .withArgs(owner.address);
+
+      expect(await coin20.getName(owner.address)).equal("");
+    });
+  });
+
   describe("Default values", function () {
     it("Should set correct minter", async function () {
       const { owner, coin20 } = await getFixture();
