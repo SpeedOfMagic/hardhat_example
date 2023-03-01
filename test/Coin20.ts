@@ -26,9 +26,9 @@ describe("Coin20", function () {
       const { owner, coin20 } = await getFixture();
       await coin20.createProfile("a", 1, true);
 
-      expect(await coin20.getName(owner.address)).equal("a");
-      expect(await coin20.getFavoriteNumber(owner.address)).equal(1);
-      expect(await coin20.getIsDating(owner.address)).equal(true);
+      expect(await coin20.getProfile(owner.address))
+      .to.emit(coin20, "GetProfile")
+      .withArgs("a", 1, true);
     });
 
     it("Remove profile", async function () {
@@ -36,13 +36,18 @@ describe("Coin20", function () {
       expect(await coin20.createProfile("a", 1, false))
       .to.emit(coin20, "CreateProfile")
       .withArgs(owner.address, "a", 1, false);
-      expect(await coin20.getName(owner.address)).equal("a");
+      
+      expect(await coin20.getProfile(owner.address))
+      .to.emit(coin20, "GetProfile")
+      .withArgs("a", 1, false);
 
       expect(await coin20.removeProfile())
       .to.emit(coin20, "RemoveProfile")
       .withArgs(owner.address);
 
-      expect(await coin20.getName(owner.address)).equal("");
+      expect(await coin20.getProfile(owner.address))
+      .to.emit(coin20, "GetProfile")
+      .withArgs("", 0, false);
     });
 
     it("Replace profile", async function () {
@@ -54,9 +59,10 @@ describe("Coin20", function () {
       expect(await coin20.createProfile("b", 2, false))
       .to.emit(coin20, "CreateProfile")
       .withArgs(owner.address, "b", 2, false);
-      expect(await coin20.getName(owner.address)).equal("b");
-      expect(await coin20.getFavoriteNumber(owner.address)).equal(2);
-      expect(await coin20.getIsDating(owner.address)).equal(false);
+      
+      expect(await coin20.getProfile(owner.address))
+      .to.emit(coin20, "GetProfile")
+      .withArgs("b", 2, false);
     });
 
     it("Remove empty profile", async function () {
@@ -65,7 +71,9 @@ describe("Coin20", function () {
       .to.emit(coin20, "RemoveProfile")
       .withArgs(owner.address);
 
-      expect(await coin20.getName(owner.address)).equal("");
+      expect(await coin20.getProfile(owner.address))
+      .to.emit(coin20, "GetProfile")
+      .withArgs("", 0, false);
     });
   });
 

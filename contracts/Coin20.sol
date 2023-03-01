@@ -11,14 +11,9 @@ contract Coin20 {
 
     mapping (address => Profile) public profiles;
 
-    function getName(address _addr) public view returns (string memory) {
-        return profiles[_addr].name;
-    }
-    function getFavoriteNumber(address _addr) public view returns (int) {
-        return profiles[_addr].favoriteNumber;
-    }
-    function getIsDating(address _addr) public view returns (bool) {
-        return profiles[_addr].isDating;
+    function getProfile(address _addr) public returns (Profile memory) {
+        emit GetProfile(msg.sender, _addr, profiles[_addr]);
+        return profiles[_addr];
     }
 
     function createProfile(string memory _name, int _favoriteNumber, bool _isDating) public {
@@ -102,6 +97,7 @@ contract Coin20 {
         return _allowance[_owner][_spender];
     }
 
+    event GetProfile(address indexed _from, address indexed _to, Profile profile);
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 }
